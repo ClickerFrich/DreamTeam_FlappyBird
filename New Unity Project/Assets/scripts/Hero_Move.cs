@@ -2,39 +2,45 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody))]
 public class Hero_Move : MonoBehaviour
 {
-    public GameObject hero;
+    public float JumpForce = 0.25f;
+    public float fall = 0.11f;
 
-    // Start is called before the first frame update
+    //что бы эта переменная работала добавьте тэг "Ground" на вашу поверхность земли
+    private Rigidbody rb;
+
     void Start()
     {
-        
+        rb = GetComponent<Rigidbody>();
     }
 
-    // Update is called once per frame
-    void Update()
+    // обратите внимание что все действия с физикой 
+    // необходимо обрабатывать в FixedUpdate, а не в Update
+    void FixedUpdate()
     {
-        /*Если нажать на экран, то пишет  "Jump"
-   
-        if (Input.touchCount > 0)
-        {
-                print("Jump"); 
-        }
-        */
+       
+        JumpLogic();
+    }
 
-        if (Input.GetKeyDown(KeyCode.W) || Input.GetMouseButtonDown(0))
+
+    private void JumpLogic()
+    {
+        if (Input.GetAxis("Jump") > 0)
         {
-            if (isUp)
-            {
-                gameObject.transform.position = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y - 1, gameObject.transform.position.z);
-                isUp = false;
-            }
-            else
-            {
-                gameObject.transform.position = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y + 1, gameObject.transform.position.z);
-                isUp = true;
-            }
+            rb.AddForce(Vector3.up * JumpForce);
+
+            // Обратите внимание что я делаю на основе Vector3.up 
+            // а не на основе transform.up. Если персонаж упал или 
+            // если персонаж -- шар, то его личный "верх" может 
+            // любое направление. Влево, вправо, вниз...
+            // Но нам нужен скачек только в абсолютный вверх, 
+            // потому и Vector3.up
+        }
+        else 
+        {
+            rb.AddForce(Vector3.down * fall);
         }
     }
 }
